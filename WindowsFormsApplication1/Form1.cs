@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows;
 using Microsoft.WindowsAPICodePack.Taskbar;
-using System.Diagnostics;
 
 namespace WindowsFormsApplication1
 {
@@ -18,10 +17,17 @@ namespace WindowsFormsApplication1
         private int day;
         private int max;
         private Form1 that;
-        private Stopwatch timer = new Stopwatch();
+        private Timer timer = new Timer();
+        private DateTime startTime = DateTime.MinValue;
+        private TimeSpan currentElapsedTime = TimeSpan.Zero;
+        private TimeSpan totalElapsedTime = TimeSpan.Zero;
+        private bool timerRunning = false;
+
         public Form1()
         {
             InitializeComponent();
+            timer.Interval = 1000;
+            timer.Tick += new EventHandler(timer_Tick);
             day = 8 * 60;
             max = 100;
             that = this;
@@ -125,6 +131,64 @@ namespace WindowsFormsApplication1
             {
                 textBox1.ForeColor = Color.Red;
             }
+        }
+
+        void timer_Tick(object sender, EventArgs e)
+        {
+            var timeSinceStartTime = DateTime.Now - startTime;
+            timeSinceStartTime = new TimeSpan(timeSinceStartTime.Hours,
+                                              timeSinceStartTime.Minutes,
+                                              timeSinceStartTime.Seconds);
+            currentElapsedTime = timeSinceStartTime + totalElapsedTime;
+            label4.Text = currentElapsedTime.ToString();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            if (!timerRunning)
+            {
+                startTime = DateTime.Now;
+                totalElapsedTime = currentElapsedTime;
+                timer.Start();
+                timerRunning = true;
+            }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            if (timerRunning)
+            {
+                timer.Stop();
+                timerRunning = false;
+            }
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            timer.Stop();
+            timerRunning = false;
+            totalElapsedTime = TimeSpan.Zero;
+            currentElapsedTime = TimeSpan.Zero;
+            var timeSinceStartTime = DateTime.Now - startTime;
+            label4.Text = currentElapsedTime.ToString();
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            var timerValue = TimeSpan.Parse(label4.Text);
+            var timerMinutes = (timerValue.Hours * 60) + timerValue.Minutes;
+            if (timerValue.Seconds > 30)
+            {
+                timerMinutes++;
+            }
+            day = day - timerMinutes;
+            callbacks();
+            timer.Stop();
+            timerRunning = false;
+            totalElapsedTime = TimeSpan.Zero;
+            currentElapsedTime = TimeSpan.Zero;
+            var timeSinceStartTime = DateTime.Now - startTime;
+            label4.Text = currentElapsedTime.ToString();
         }
 
 
