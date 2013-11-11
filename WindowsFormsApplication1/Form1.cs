@@ -57,8 +57,8 @@ namespace WindowsFormsApplication1
             }
             label1.Text = labelText();
             label1.Update();
-            that.Text = labelText();
             double percentage = day / 4.8;
+            that.Text = labelText() + " - " + (100 - Convert.ToInt32(percentage)) + "%";
             progressBar1.Value = 100 - Convert.ToInt32(percentage);
             progressBar1.Update();
             var prog = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
